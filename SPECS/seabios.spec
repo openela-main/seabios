@@ -1,6 +1,6 @@
 Name:           seabios
 Version:        1.16.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Open-source legacy BIOS implementation
 
 Group:          Applications/Emulators
@@ -30,6 +30,10 @@ Patch6: seabios-pci-refactor-the-pci_config_-functions.patch
 Patch7: seabios-reset-force-standard-PCI-configuration-access.patch
 # For bz#2101787 - [rhel.8.7] Loading a kernel/initrd is sometimes very slow
 Patch8: seabios-virtio-blk-use-larger-default-request-size.patch
+# For bz#2227373 - "No bootable device" with OS boot disk interface VirtIO-SCSI and with more than 9 VirtIO disks.
+Patch9: seabios-malloc-use-variable-for-ZoneHigh-size.patch
+# For bz#2227373 - "No bootable device" with OS boot disk interface VirtIO-SCSI and with more than 9 VirtIO disks.
+Patch10: seabios-malloc-use-large-ZoneHigh-when-there-is-enough-memor.patch
 
 BuildRequires: python3 iasl
 ExclusiveArch: x86_64 %{power64}
@@ -88,6 +92,8 @@ SeaVGABIOS is an open-source VGABIOS implementation.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
+%patch10 -p1
 
 %build
 %ifarch x86_64
@@ -146,6 +152,12 @@ install -m 0644 binaries/vgabios*.bin $RPM_BUILD_ROOT%{_datadir}/seavgabios
 
 
 %changelog
+* Thu Aug 03 2023 Jon Maloy <jmaloy@redhat.com> - 1.16.0-4
+- seabios-malloc-use-variable-for-ZoneHigh-size.patch [bz#2227373]
+- seabios-malloc-use-large-ZoneHigh-when-there-is-enough-memor.patch [bz#2227373]
+- Resolves: bz#2227373
+  ("No bootable device" with OS boot disk interface VirtIO-SCSI and with more than 9 VirtIO disks.)
+
 * Wed Jul 27 2022 Miroslav Rezanina <mrezanin@redhat.com> - 1.16.0-3
 - seabios-virtio-blk-use-larger-default-request-size.patch [bz#2101787]
 - Resolves: bz#2101787
