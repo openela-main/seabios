@@ -1,21 +1,24 @@
 Name:           seabios
-Version:        1.16.1
-Release:        1%{?dist}
+Version:        1.16.3
+Release:        2%{?dist}
 Summary:        Open-source legacy BIOS implementation
 
 License:        LGPLv3
 URL:            https://www.coreboot.org/SeaBIOS
 
-Source0:        https://code.coreboot.org/p/seabios/downloads/get/seabios-1.16.1.tar.gz
+Source0:        https://code.coreboot.org/p/seabios/downloads/get/seabios-1.16.3.tar.gz
 
 
 Source10:       config.vga-cirrus
-Source12:       config.vga-qxl
 Source13:       config.vga-stdvga
 Source18:       config.seabios-256k
 Source19:       config.vga-virtio
 Source20:       config.vga-ramfb
 Source21:       config.vga-bochs-display
+# For RHEL-7110 - [seabios] Can't boot from a disk with 4K sector size
+Patch1: seabios-add-hwerr_printf-function-for-threads.patch
+# For RHEL-7110 - [seabios] Can't boot from a disk with 4K sector size
+Patch2: seabios-display-error-message-for-blocksizes-512.patch
 
 BuildRequires: make
 BuildRequires: gcc
@@ -105,7 +108,7 @@ build_bios %{_sourcedir}/config.seabios-256k bios.bin bios-256k.bin
 
 
 # seavgabios
-%global vgaconfigs cirrus qxl stdvga virtio ramfb bochs-display
+%global vgaconfigs cirrus stdvga virtio ramfb bochs-display
 for config in %{vgaconfigs}; do
     build_bios %{_sourcedir}/config.vga-${config} \
                vgabios.bin vgabios-${config}.bin out/vgabios.bin
@@ -132,6 +135,20 @@ install -m 0644 binaries/vgabios*.bin $RPM_BUILD_ROOT%{_datadir}/seavgabios
 %{_datadir}/seavgabios/vgabios*.bin
 
 %changelog
+* Wed Jan 10 2024 Miroslav Rezanina <mrezanin@redhat.com> - 1.16.3-2
+- seabios-add-hwerr_printf-function-for-threads.patch [RHEL-7110]
+- seabios-display-error-message-for-blocksizes-512.patch [RHEL-7110]
+- Resolves: RHEL-7110
+  ([seabios] Can't boot from a disk with 4K sector size)
+
+* Wed Dec 13 2023 Miroslav Rezanina <mrezanin@redhat.com> - 1.16.3-1
+- Rebase to 1.16.3 [RHEL-19239]
+- Removed vgabios-qxl.bin [RHEL-383]
+- Resolves: RHEL-19239
+  (Rebase seabios to 1.16.3)
+- Resolves: RHEL-383
+  (remove vgabios-qxl.bin from seavgabios in rhel9)
+
 * Wed Dec 07 2022 Miroslav Rezanina <mrezanin@redhat.com> - 1.16.1-1
 - Rebase to 1.16.1 [bz#2149280]
 - Resolves: bz#2149280
