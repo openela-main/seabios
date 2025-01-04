@@ -1,6 +1,6 @@
 Name:           seabios
 Version:        1.16.3
-Release:        2%{?dist}
+Release:        2%{?dist}.1
 Summary:        Open-source legacy BIOS implementation
 
 License:        LGPLv3
@@ -19,6 +19,8 @@ Source21:       config.vga-bochs-display
 Patch1: seabios-add-hwerr_printf-function-for-threads.patch
 # For RHEL-7110 - [seabios] Can't boot from a disk with 4K sector size
 Patch2: seabios-display-error-message-for-blocksizes-512.patch
+# For RHEL-68955 - amdgpu failed to initialize when multiple AMD MI210 GPUs assigned and firmware is seabios [rhel-9.5.z]
+Patch3: seabios-pciinit-don-t-misalign-large-BARs.patch
 
 BuildRequires: make
 BuildRequires: gcc
@@ -135,6 +137,11 @@ install -m 0644 binaries/vgabios*.bin $RPM_BUILD_ROOT%{_datadir}/seavgabios
 %{_datadir}/seavgabios/vgabios*.bin
 
 %changelog
+* Thu Nov 28 2024 Miroslav Rezanina <mrezanin@redhat.com> - 1.16.3-2.el9_5.1
+- seabios-pciinit-don-t-misalign-large-BARs.patch [RHEL-68955]
+- Resolves: RHEL-68955
+  (amdgpu failed to initialize when multiple AMD MI210 GPUs assigned and firmware is seabios [rhel-9.5.z])
+
 * Wed Jan 10 2024 Miroslav Rezanina <mrezanin@redhat.com> - 1.16.3-2
 - seabios-add-hwerr_printf-function-for-threads.patch [RHEL-7110]
 - seabios-display-error-message-for-blocksizes-512.patch [RHEL-7110]
