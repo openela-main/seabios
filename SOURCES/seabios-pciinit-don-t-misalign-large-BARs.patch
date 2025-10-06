@@ -1,0 +1,59 @@
+From 5521f68fd19c268d31df8175d17eeac5f4e7b597 Mon Sep 17 00:00:00 2001
+From: Daniil Tatianin <d-tatianin@yandex-team.ru>
+Date: Thu, 11 Apr 2024 22:51:35 +0300
+Subject: [PATCH] pciinit: don't misalign large BARs
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+RH-Author: Gerd Hoffmann <kraxel@redhat.com>
+RH-MergeRequest: 8: pciinit: don't misalign large BARs
+RH-Jira: RHEL-67847
+RH-Acked-by: Oliver Steffen <osteffen@redhat.com>
+RH-Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+RH-Commit: [1/1] 308bfda29758ed7934c847cc45e25c4e67a1446e (kraxel.rh/centos-src-seabios)
+
+Previously we would unconditionally lower the alignment for large BARs
+in case their alignment was greater than "pci_mem64_top >> 11", this
+would make it impossible to use these devices by the kernel:
+    [   13.821108] pci 0000:9c:00.0: can't claim BAR 1 [mem 0x66000000000-0x67fffffffff 64bit pref]: no compatible bridge window
+    [   13.823492] pci 0000:9d:00.0: can't claim BAR 1 [mem 0x64000000000-0x65fffffffff 64bit pref]: no compatible bridge window
+    [   13.824218] pci 0000:9e:00.0: can't claim BAR 1 [mem 0x62000000000-0x63fffffffff 64bit pref]: no compatible bridge window
+    [   13.828322] pci 0000:8a:00.0: can't claim BAR 1 [mem 0x6e000000000-0x6ffffffffff 64bit pref]: no compatible bridge window
+    [   13.830691] pci 0000:8b:00.0: can't claim BAR 1 [mem 0x6c000000000-0x6dfffffffff 64bit pref]: no compatible bridge window
+    [   13.832218] pci 0000:8c:00.0: can't claim BAR 1 [mem 0x6a000000000-0x6bfffffffff 64bit pref]: no compatible bridge window
+
+Fix it by only overwriting the alignment in case it's actually greater
+than the desired by the BAR window.
+
+Fixes: 96a8d130a8c ("be less conservative with the 64bit pci io window")
+Signed-off-by: Daniil Tatianin <d-tatianin@yandex-team.ru>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+(cherry picked from commit e5f2e4c69643bc3cd385306a9e5d29e11578148c)
+Resolves: RHEL-67847
+---
+ src/fw/pciinit.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/fw/pciinit.c b/src/fw/pciinit.c
+index 6b13cd5b..bb44dc29 100644
+--- a/src/fw/pciinit.c
++++ b/src/fw/pciinit.c
+@@ -970,9 +970,11 @@ static int pci_bios_check_devices(struct pci_bus *busses)
+             int resource_optional = 0;
+             if (hotplug_support == HOTPLUG_PCIE)
+                 resource_optional = pcie_cap && (type == PCI_REGION_TYPE_IO);
++
++            u64 top_align = pci_mem64_top >> 11;
+             if (hotplug_support && pci_pad_mem64 && is64
+-                && (type == PCI_REGION_TYPE_PREFMEM))
+-                align = pci_mem64_top >> 11;
++                && (type == PCI_REGION_TYPE_PREFMEM) && (top_align > align))
++                align = top_align;
+             if (align > sum && hotplug_support && !resource_optional)
+                 sum = align; /* reserve min size for hot-plug */
+             if (size > sum) {
+-- 
+2.39.3
+
