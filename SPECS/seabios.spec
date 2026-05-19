@@ -1,6 +1,6 @@
 Name:           seabios
 Version:        1.16.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Open-source legacy BIOS implementation
 
 License:        LGPLv3
@@ -21,6 +21,8 @@ Patch1: seabios-add-hwerr_printf-function-for-threads.patch
 Patch2: seabios-display-error-message-for-blocksizes-512.patch
 # For RHEL-67846 - amdgpu failed to initialize when multiple AMD MI210 GPUs assigned and firmware is seabios [rhel-9]
 Patch3: seabios-pciinit-don-t-misalign-large-BARs.patch
+# For RHEL-131918 - [rhel-9] SeaBIOS date is "stuck" at 2014 even for recent releases
+Patch4: seabios-update-release-date.patch
 
 BuildRequires: make
 BuildRequires: gcc
@@ -137,6 +139,14 @@ install -m 0644 binaries/vgabios*.bin $RPM_BUILD_ROOT%{_datadir}/seavgabios
 %{_datadir}/seavgabios/vgabios*.bin
 
 %changelog
+* Tue Dec 02 2025 Jon Maloy <jmaloy@redhat.com> - 1.16.3-5
+- seabios-update-release-date.patch [RHEL-131918 RHEL-131921]
+- seabios-turn-off-SMM-support.patch [RHEL-131918 RHEL-131921]
+- Resolves: RHEL-131918
+  ([rhel-9] SeaBIOS date is "stuck" at 2014 even for recent releases)
+- Resolves: RHEL-131921
+  ([RHEL-9] Grub graphics modules crash VM when there's no graphics)
+
 * Thu Nov 28 2024 Miroslav Rezanina <mrezanin@redhat.com> - 1.16.3-4
 - seabios-Remove-iasl-from-BuildRequires.patch [RHEL-39020]
 - Resolves: RHEL-39020
