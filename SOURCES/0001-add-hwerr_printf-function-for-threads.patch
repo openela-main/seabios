@@ -1,4 +1,4 @@
-From 81218e2fd9442ce2cbc901b7f6d2b3df3f705bba Mon Sep 17 00:00:00 2001
+From a332053b6e021e861602d2fea68d4fa9a4832e40 Mon Sep 17 00:00:00 2001
 From: Gerd Hoffmann <kraxel@redhat.com>
 Date: Wed, 3 May 2023 10:31:23 +0200
 Subject: [PATCH] add hwerr_printf function for threads

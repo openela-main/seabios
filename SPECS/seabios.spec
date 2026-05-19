@@ -1,12 +1,12 @@
 Name:           seabios
-Version:        1.16.3
-Release:        7%{?dist}
+Version:        1.17.0
+Release:        1%{?dist}
 Summary:        Open-source legacy BIOS implementation
 
 License:        LGPL-3.0-only
 URL:            https://www.coreboot.org/SeaBIOS
 
-Source0:        https://code.coreboot.org/p/seabios/downloads/get/seabios-1.16.3.tar.gz
+Source0:        https://code.coreboot.org/p/seabios/downloads/get/seabios-1.17.0.tar.gz
 
 
 Source10:       config.vga-cirrus
@@ -15,11 +15,11 @@ Source18:       config.seabios-256k
 Source19:       config.vga-virtio
 Source20:       config.vga-ramfb
 Source21:       config.vga-bochs-display
-
 Patch1: 0001-add-hwerr_printf-function-for-threads.patch
 Patch2: 0002-display-error-message-for-blocksizes-512.patch
+Patch3: 0003-update-release-date.patch
+
 # For RHEL-67847 - amdgpu failed to initialize when multiple AMD MI210 GPUs assigned and firmware is seabios [rhel-10]
-Patch3: seabios-pciinit-don-t-misalign-large-BARs.patch
 
 BuildRequires: make
 BuildRequires: gcc
@@ -136,6 +136,13 @@ install -m 0644 binaries/vgabios*.bin $RPM_BUILD_ROOT%{_datadir}/seavgabios
 %{_datadir}/seavgabios/vgabios*.bin
 
 %changelog
+* Fri Dec 05 2025 Miroslav Rezanina <mrezanin@redhat.com> - 1.17.0-1
+- Rebase to seabios 1.17.0
+- Resolves: RHEL-127509
+  (rebase seabios to upstream release 1.17.0)
+- Resolves: RHEL-64639
+  ([RHEL-10] Grub graphics modules crash VM when there's no graphics)
+
 * Thu Nov 28 2024 Miroslav Rezanina <mrezanin@redhat.com> - 1.16.3-7
 - seabios-Remove-iasl-from-BuildRequires.patch [RHEL-68975]
 - Resolves: RHEL-68975

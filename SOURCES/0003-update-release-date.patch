@@ -1,0 +1,26 @@
+From 2cb8b95cd7542d57b2b5b9dc09e67c2519f5948e Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 5 Nov 2025 10:59:08 +0100
+Subject: [PATCH] update release date
+
+upstream release 1.17.0 was tagged on June 10th 2025,
+so use that as release date on smbios table 0
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ src/fw/biostables.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/fw/biostables.c b/src/fw/biostables.c
+index 90712d4b..d5c862dd 100644
+--- a/src/fw/biostables.c
++++ b/src/fw/biostables.c
+@@ -483,7 +483,7 @@ smbios_new_type_0(void *start,
+ }
+ 
+ #define BIOS_NAME "SeaBIOS"
+-#define BIOS_DATE "04/01/2014"
++#define BIOS_DATE "06/10/2025"
+ 
+ /*
+  * Build tables using qtables as input, adding additional type 0

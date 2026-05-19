@@ -1,4 +1,4 @@
-From 39c280452e101edb814989300e2815cee3ea75c4 Mon Sep 17 00:00:00 2001
+From 4fe405cc25a9a48832431ec81fff68cf647fc41b Mon Sep 17 00:00:00 2001
 From: Gerd Hoffmann <kraxel@redhat.com>
 Date: Wed, 3 May 2023 10:36:32 +0200
 Subject: [PATCH] display error message for blocksizes != 512
@@ -24,18 +24,18 @@ Patch-present-in-specfile: True
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/hw/blockcmd.c b/src/hw/blockcmd.c
-index 6b6fea97..ff88680b 100644
+index f59b2ef0..5c89f311 100644
 --- a/src/hw/blockcmd.c
 +++ b/src/hw/blockcmd.c
-@@ -336,7 +336,7 @@ scsi_drive_setup(struct drive_s *drive, const char *s, int prio)
-     // 64-bit LBA anyway.
-     drive->blksize = be32_to_cpu(capdata.blksize);
+@@ -369,7 +369,7 @@ scsi_drive_setup(struct drive_s *drive, const char *s, int prio)
+     }
+ 
      if (drive->blksize != DISK_SECTOR_SIZE) {
 -        dprintf(1, "%s: unsupported block size %d\n", s, drive->blksize);
 +        hwerr_printf("%s: unsupported block size %d\n", s, drive->blksize);
          return -1;
      }
-     drive->sectors = (u64)be32_to_cpu(capdata.sectors) + 1;
+     dprintf(1, "%s blksize=%d sectors=0x%llx\n", s, drive->blksize, drive->sectors);
 diff --git a/src/hw/virtio-blk.c b/src/hw/virtio-blk.c
 index 137a2c3c..1d6f7d4b 100644
 --- a/src/hw/virtio-blk.c
