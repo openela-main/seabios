@@ -1,6 +1,6 @@
 Name:           seabios
 Version:        1.16.3
-Release:        5%{?dist}
+Release:        5%{?dist}.1
 Summary:        Open-source legacy BIOS implementation
 
 License:        LGPLv3
@@ -23,6 +23,10 @@ Patch2: seabios-display-error-message-for-blocksizes-512.patch
 Patch3: seabios-pciinit-don-t-misalign-large-BARs.patch
 # For RHEL-131918 - [rhel-9] SeaBIOS date is "stuck" at 2014 even for recent releases
 Patch4: seabios-update-release-date.patch
+# For RHEL-240025 - Backport opt/org.seabios/pci64 to SeaBIOS 1.16 / el9 [rhel-9.8.z]
+Patch5: seabios-add-romfile_loadbool.patch
+# For RHEL-240025 - Backport opt/org.seabios/pci64 to SeaBIOS 1.16 / el9 [rhel-9.8.z]
+Patch6: seabios-update-pci_pad_mem64-handling.patch
 
 BuildRequires: make
 BuildRequires: gcc
@@ -139,6 +143,12 @@ install -m 0644 binaries/vgabios*.bin $RPM_BUILD_ROOT%{_datadir}/seavgabios
 %{_datadir}/seavgabios/vgabios*.bin
 
 %changelog
+* Tue Sep 22 2026 Jon Maloy <jmaloy@redhat.com> - 1.16.3-5.el9_8.1
+- seabios-add-romfile_loadbool.patch [RHEL-240025]
+- seabios-update-pci_pad_mem64-handling.patch [RHEL-240025]
+- Resolves: RHEL-240025
+  (Backport opt/org.seabios/pci64 to SeaBIOS 1.16 / el9 [rhel-9.8.z])
+
 * Tue Dec 02 2025 Jon Maloy <jmaloy@redhat.com> - 1.16.3-5
 - seabios-update-release-date.patch [RHEL-131918 RHEL-131921]
 - seabios-turn-off-SMM-support.patch [RHEL-131918 RHEL-131921]

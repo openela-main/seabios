@@ -1,0 +1,70 @@
+From 3244d04ba31f1b885275467a57d69a983c85a164 Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 22 Nov 2024 15:16:32 +0100
+Subject: [PATCH 1/2] add romfile_loadbool()
+
+RH-Author: Gerd Hoffmann <kraxel@redhat.com>
+RH-MergeRequest: 15: backport opt/org.seabios/pci64 config option
+RH-Jira: RHEL-240025
+RH-Acked-by: Luigi Leonardi <None>
+RH-Acked-by: Oliver Steffen <osteffen@redhat.com>
+RH-Commit: [1/2] 76a73d58e8966086eebd8e1664acf609fff48826
+
+Translates strings in fw_cfg files into boolean values.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+(cherry picked from commit a4fc1845b43687fe01c6f53fca9d7c1ac1b725d7)
+---
+ src/romfile.c | 23 +++++++++++++++++++++++
+ src/romfile.h |  1 +
+ 2 files changed, 24 insertions(+)
+
+diff --git a/src/romfile.c b/src/romfile.c
+index b598274e..8072a915 100644
+--- a/src/romfile.c
++++ b/src/romfile.c
+@@ -99,6 +99,29 @@ romfile_loadint(const char *name, u64 defval)
+     return val;
+ }
+ 
++u32
++romfile_loadbool(const char *name, u32 defval)
++{
++    static const char *true_strings[] = { "1", "on", "yes" };
++    static const char *false_strings[] = { "0", "off", "no" };
++    char *str = romfile_loadfile(name, NULL);
++    int i;
++
++    if (!str)
++        return defval;
++
++    for (i = 0; i < ARRAY_SIZE(true_strings); i++)
++        if (0 == strcmp(str, true_strings[i]))
++            return 1;
++
++    for (i = 0; i < ARRAY_SIZE(false_strings); i++)
++        if (0 == strcmp(str, false_strings[i]))
++            return 0;
++
++    dprintf(1, "%s: unknown bool string: %s\n", __func__, str);
++    return defval;
++}
++
+ struct const_romfile_s {
+     struct romfile_s file;
+     void *data;
+diff --git a/src/romfile.h b/src/romfile.h
+index 3e0f8200..ae2f4ac7 100644
+--- a/src/romfile.h
++++ b/src/romfile.h
+@@ -15,6 +15,7 @@ struct romfile_s *romfile_findprefix(const char *prefix, struct romfile_s *prev)
+ struct romfile_s *romfile_find(const char *name);
+ void *romfile_loadfile(const char *name, int *psize);
+ u64 romfile_loadint(const char *name, u64 defval);
++u32 romfile_loadbool(const char *name, u32 defval);
+ 
+ void const_romfile_add_int(char *name, u32 value);
+ 
+-- 
+2.52.0
+
